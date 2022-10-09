@@ -57,6 +57,11 @@ export class WaterJugProblem {
     let i = 0;
     while (i < this.states.length) {
       const state = this.states[i];
+
+      if (this.checkFinalState(state)) {
+        return state;
+      }
+
       const actions = [
         this.fillA(state),
         this.fillB(state),
@@ -66,17 +71,13 @@ export class WaterJugProblem {
         this.pourBtoA(state),
       ];
 
-      actions.forEach((action) => {
+      for (const action of actions) {
         if (!this.isStateExist(action)) {
           this.states.push(action);
+          break;
         }
-      });
-
-      if (this.checkFinalState(state)) {
-        return state;
       }
 
-      console.log(state);
       i++;
     }
   }
@@ -122,5 +123,5 @@ const problem = new WaterJugProblem(6, capacities);
 // problem.solve();
 // console.log(problem.states[problem.states.length - 1]);
 
-problem.getShortestPath();
+problem.solve();
 console.log(problem.states);
