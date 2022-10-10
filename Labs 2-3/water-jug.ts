@@ -53,7 +53,7 @@ export class WaterJugProblem {
     return [state[0] + amount, state[1] - amount];
   }
 
-  solve() {
+  solveGreedy() {
     let i = 0;
     while (i < this.states.length) {
       const state = this.states[i];
@@ -82,35 +82,12 @@ export class WaterJugProblem {
     }
   }
 
-  getShortestPath() {
-    const queue: number[][][] = [];
+  solveBFS() {
+    //BFS algorithm here
+  }
 
-    queue.push(this.states);
-
-    while (queue.length > 0) {
-      const lastPath = queue.shift() as number[][];
-      const lastState = lastPath[(lastPath?.length as number) - 1];
-
-      if (this.checkFinalState(lastState)) {
-        return lastPath;
-      }
-
-      const actions = [
-        this.fillA(lastState),
-        this.fillB(lastState),
-        this.emptyA(lastState),
-        this.emptyB(lastState),
-        this.pourAtoB(lastState),
-        this.pourBtoA(lastState),
-      ];
-
-      actions.forEach((action) => {
-        if (!this.isStateExist(action)) {
-          this.states.push(action);
-          queue.push(this.states);
-        }
-      });
-    }
+  solveBacktracking() {
+    //Backtracking algorithm here
   }
 }
 
@@ -120,8 +97,6 @@ const capacities: Capacity = {
 };
 
 const problem = new WaterJugProblem(6, capacities);
-// problem.solve();
-// console.log(problem.states[problem.states.length - 1]);
 
-problem.solve();
+problem.solveGreedy();
 console.log(problem.states);
