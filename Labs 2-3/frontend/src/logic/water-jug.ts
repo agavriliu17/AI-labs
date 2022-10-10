@@ -1,7 +1,4 @@
-export interface Capacity {
-  A: number;
-  B: number;
-}
+import { Capacity } from "./interfaces";
 
 export class WaterJugProblem {
   final: number;
@@ -91,7 +88,7 @@ export class WaterJugProblem {
   }
 
   validate(final: number, capacities: Capacity) {
-    const gcd = (a: number, b: number) => {
+    const gcd = (a: number, b: number): number => {
       if (b === 0) return a;
       return gcd(b, a % b);
     };
@@ -102,12 +99,12 @@ export class WaterJugProblem {
   }
 }
 
-const capacities: Capacity = {
-  A: 9,
-  B: 4,
-};
+// const capacities: Capacity = {
+//   A: 9,
+//   B: 4,
+// };
 
-const problem = new WaterJugProblem(6, capacities);
+// const problem = new WaterJugProblem(6, capacities);
 
-problem.solveGreedy();
-console.log(problem.states);
+// problem.solveGreedy();
+// console.log(problem.states);
