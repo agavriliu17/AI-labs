@@ -11,6 +11,7 @@ import Input from "@mui/joy/Input";
 import Button from "@mui/joy/Button";
 import { UserInput, Strategies, Capacity } from "./logic/interfaces";
 import { WaterJugProblem } from "./logic/water-jug";
+import ResultsModal from "./Modal";
 
 function App() {
   const [inputs, setInputs] = useState<UserInput>({
@@ -19,7 +20,9 @@ function App() {
     final: 0,
   });
   const [strategy, setStrategy] = useState<Strategies>(Strategies.Greedy);
+  const [problem, setProblem] = useState<WaterJugProblem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -63,12 +66,16 @@ function App() {
         default:
           break;
       }
+      setProblem(waterJugProblem);
+      setOpen(true);
     } else {
       setError(
         "Seems like it's not possible to solve this problem with given inputs"
       );
     }
   };
+
+  const handleModalClose = () => setOpen(false);
 
   const disabledButton = !inputs.first || !inputs.second || !inputs.final;
   return (
@@ -217,6 +224,13 @@ function App() {
             {error}
           </Typography>
         )}
+
+        <ResultsModal
+          open={open}
+          onClose={handleModalClose}
+          problem={problem}
+          type={strategy}
+        />
       </Sheet>
     </CssVarsProvider>
   );
