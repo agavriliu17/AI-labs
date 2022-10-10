@@ -89,6 +89,17 @@ export class WaterJugProblem {
   solveBacktracking() {
     //Backtracking algorithm here
   }
+
+  validate(final: number, capacities: Capacity) {
+    const gcd = (a: number, b: number) => {
+      if (b === 0) return a;
+      return gcd(b, a % b);
+    };
+
+    const gcdAB = gcd(capacities.A, capacities.B);
+
+    return final % gcdAB === 0 && final <= capacities.A + capacities.B;
+  }
 }
 
 const capacities: Capacity = {
