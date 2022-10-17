@@ -11,7 +11,7 @@ export interface JugState {
 }
 
 export interface HeuristicResult {
-  state: Jug;
+  state: JugState;
   value: number;
 }
 

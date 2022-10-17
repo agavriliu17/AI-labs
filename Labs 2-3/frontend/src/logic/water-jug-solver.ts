@@ -1,6 +1,6 @@
 import { NO_SOLUTION, STATE } from "./constants";
 import { dangerousDeepClone } from "./utils";
-import { Jug, JugState, HeuristicResult } from "./interfaces";
+import { HeuristicResult, Jug, JugState } from "./interfaces";
 
 export class WaterJugSolver {
   queue: JugState[] = [];
@@ -251,6 +251,9 @@ export class WaterJugSolver {
   }
 
   solveAStar(): JugState[] | typeof NO_SOLUTION {
+    let statesQueue: HeuristicResult[] = [];
+    let explored: HeuristicResult[] = [];
+
     if (!this.validateInstance()) {
       return NO_SOLUTION;
     }
@@ -260,57 +263,40 @@ export class WaterJugSolver {
     );
 
     for (let res of heuristicResults) {
-      this.queue.push(res.state);
+      statesQueue.push(res);
     }
 
-    while (this.queue.length) {
-      const current = this.queue.shift() as JugState;
+    let bestScore = heuristicResults[heuristicResults.length - 1].value;
 
-      if (this.stateHasGoal(current)) {
+    let newState = statesQueue.shift() as HeuristicResult;
+
+    while (newState?.value < bestScore) {
+      if (this.stateHasGoal(newState.state)) {
         return this.pathList.find(
-          (path) => path[path.length - 1].simple === current.simple
+          (path) => path[path.length - 1].simple === newState.state.simple
         ) as JugState[];
       }
-
-      const neighborHeuristicResults = this.generateNextStates(current);
-
-      for (let res of neighborHeuristicResults) {
-        const seen = this.queue.includes(res.state);
-        if (!seen) {
-          continue;
+      explored.push(newState);
+      let neighbours = this.generateNextStates(newState.state);
+      for (let element of neighbours) {
+        let distance = this.pathList.length;
+        element.value += distance;
+        const elementIndex = statesQueue.findIndex(
+          (state) => state.state.simple === element.state.simple
+        );
+        if (elementIndex === -1) {
+          statesQueue.push(element);
+        } else {
+          if (statesQueue[elementIndex].value > element.value) {
+            statesQueue[elementIndex] = element;
+          }
         }
       }
-
-      // for (let state of nextStates) {
-      //   const seen = this.tree.has(state.simple);
-
-      //   if (!seen) {
-      //     this.addEdge(current.simple, state.simple);
-      //     this.buildPathForState(current, state);
-      //     this.queue.push(state);
-      //   }
-
-      //   const neighbors = [
-      //     this.fillJug(state, "small"),
-      //     this.fillJug(state, "large"),
-      //     this.emptyJug(state, "small"),
-      //     this.emptyJug(state, "large"),
-      //     this.transfer(state, "small"),
-      //     this.transfer(state, "large"),
-      //   ];
-
-      //   for (let neighbor of neighbors) {
-      //     const seen = this.tree.has(neighbor.simple);
-
-      //     if (!seen) {
-      //       this.addEdge(state.simple, neighbor.simple);
-      //       this.buildPathForState(state, neighbor);
-      //       this.queue.push(neighbor);
-      //     }
-      //   }
-      // }
+      statesQueue.sort((a, b) => a.value - b.value);
+      newState = statesQueue.shift() as HeuristicResult;
     }
 
+    console.log(statesQueue);
     return NO_SOLUTION;
   }
 
@@ -332,14 +318,14 @@ export class WaterJugSolver {
 
       if (!seen) {
         heuristicResults.push({
-          heuristicValue: this.heuristic(state),
+          value: this.heuristic(state),
           state: state,
         });
       }
     }
 
     // sort by heuristic value
-    heuristicResults.sort((a, b) => a.heuristicValue - b.heuristicValue);
+    heuristicResults.sort((a, b) => a.value - b.value);
     return heuristicResults;
   }
 

@@ -36,7 +36,7 @@ function App() {
   useEffect(() => {
     const solver = new WaterJugSolver(9, 4, 6);
 
-    console.log(solver.solveBFS());
+    console.log(solver.solveAStar());
   }, []);
   const handleSubmit = () => {
     const { first, second, final } = inputs;
