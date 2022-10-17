@@ -6,13 +6,13 @@ import Modal from "@mui/joy/Modal";
 import ModalClose from "@mui/joy/ModalClose";
 import ModalDialog from "@mui/joy/ModalDialog";
 import Typography from "@mui/joy/Typography";
-import { WaterJugProblem } from "./logic/water-jug";
+import { WaterJugSolver } from "./logic/water-jug-solver";
 import Sheet from "@mui/joy/Sheet";
 
 interface Props {
   open: boolean;
   type: Strategies;
-  problem: WaterJugProblem | null;
+  problem: WaterJugSolver | null;
   onClose: () => void;
 }
 
@@ -37,13 +37,13 @@ const ResultsModal: FC<Props> = ({ type, problem, onClose, open }) => {
         </Typography>
         <Typography textColor="text.tertiary">Algorithm: {type}</Typography>
         <Typography textColor="text.tertiary" mt="10px">
-          First bucket capacity: {problem?.capacities.A} liters
+          First bucket capacity: {problem?.xGallon} liters
         </Typography>
         <Typography textColor="text.tertiary">
-          Second bucket capacity: {problem?.capacities.B} liters
+          Second bucket capacity: {problem?.yGallon} liters
         </Typography>
         <Typography textColor="text.tertiary">
-          Desired quantity: {problem?.final} liters
+          Desired quantity: {problem?.zGallon} liters
         </Typography>
 
         <Typography mt="20px" textAlign="center" fontWeight="600">
@@ -57,7 +57,7 @@ const ResultsModal: FC<Props> = ({ type, problem, onClose, open }) => {
             justifyContent: "center",
           }}
         >
-          {problem?.states.map((state, index) => (
+          {/* {problem?.states.map((state, index) => (
             <Fragment key={index}>
               <Typography
                 textColor={
@@ -75,7 +75,7 @@ const ResultsModal: FC<Props> = ({ type, problem, onClose, open }) => {
                 </Typography>
               )}
             </Fragment>
-          ))}
+          ))} */}
         </Sheet>
 
         <Sheet

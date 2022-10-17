@@ -1,5 +1,5 @@
 import { NO_SOLUTION, STATE } from "./constants";
-import { dangerousDeepClone, isEven, isOdd } from "./utils";
+import { dangerousDeepClone } from "./utils";
 import { Jug, JugState } from "./interfaces";
 
 export class WaterJugSolver {
@@ -120,13 +120,7 @@ export class WaterJugSolver {
   }
 
   solveBFS(): JugState[] | typeof NO_SOLUTION {
-    // ZGallon can't be more water than the combined jugs.
-    if (this.xGallon + this.yGallon < this.zGallon) {
-      return NO_SOLUTION;
-    }
-
-    // If ZGallon is odd and jugs are even, is impossible.
-    if (isEven(this.xGallon) && isEven(this.yGallon) && isOdd(this.zGallon)) {
+    if (!this.validateInstance()) {
       return NO_SOLUTION;
     }
 
@@ -161,6 +155,7 @@ export class WaterJugSolver {
     return NO_SOLUTION;
   }
 
+  //Backtracking solution with recursion.
   solveBKT(state: JugState = this.queue[0]) {
     if (this.stateHasGoal(state)) {
       return this.pathList.find(
@@ -191,8 +186,19 @@ export class WaterJugSolver {
       }
     }
   }
-}
 
-// const solver = new WaterJugSolver(9, 4, 6);
-// console.log(solver.solveBFS());
-// console.log(solver.solveBKTR());
+  validateInstance(
+    xGallon = this.xGallon,
+    yGallon = this.yGallon,
+    zGallon = this.zGallon
+  ): boolean {
+    const gcd = (a: number, b: number): number => {
+      if (b === 0) return a;
+      return gcd(b, a % b);
+    };
+
+    const gcdAB = gcd(xGallon, yGallon);
+
+    return zGallon % gcdAB === 0 && zGallon <= xGallon + yGallon;
+  }
+}

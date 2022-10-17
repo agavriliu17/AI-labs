@@ -10,6 +10,3 @@ export const parseIntValue = (numberLike: string | number) => {
 
 export const dangerousDeepClone = <T>(obj: T): T =>
   JSON.parse(JSON.stringify(obj));
-
-export const isEven = (value: number) => value % 2 === 0;
-export const isOdd = (value: number) => !isEven(value);

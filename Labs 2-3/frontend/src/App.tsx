@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import { CssVarsProvider } from "@mui/joy/styles";
@@ -9,10 +9,9 @@ import Radio from "@mui/joy/Radio";
 import RadioGroup from "@mui/joy/RadioGroup";
 import Input from "@mui/joy/Input";
 import Button from "@mui/joy/Button";
-import { UserInput, Strategies, Capacity } from "./logic/interfaces";
-import { WaterJugProblem } from "./logic/water-jug";
+import { UserInput, Strategies } from "./logic/interfaces";
 import ResultsModal from "./Modal";
-import { WaterJugSolver } from "./new/water-jug-solver";
+import { WaterJugSolver } from "./logic/water-jug-solver";
 
 function App() {
   const [inputs, setInputs] = useState<UserInput>({
@@ -21,7 +20,7 @@ function App() {
     final: 0,
   });
   const [strategy, setStrategy] = useState<Strategies>(Strategies.BFS);
-  const [problem, setProblem] = useState<WaterJugProblem | null>(null);
+  const [problem, setProblem] = useState<WaterJugSolver | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -34,49 +33,24 @@ function App() {
     setStrategy(event.target.value as Strategies);
   };
 
-  useEffect(() => {
-    const solver = new WaterJugSolver(9, 4, 6);
-    console.log(solver.solveBFS());
-    solver.solveBKT();
-    console.log(solver.pathList);
-  }, []);
-
   const handleSubmit = () => {
     const { first, second, final } = inputs;
-    const capacities: Capacity = {
-      A: parseInt(first as unknown as string),
-      B: parseInt(second as unknown as string),
-    };
+    const solver = new WaterJugSolver(first, second, final);
 
-    const waterJugProblem = new WaterJugProblem(
-      parseInt(final as unknown as string),
-      capacities
-    );
-
-    const isPossible = waterJugProblem.validate(
-      parseInt(final as unknown as string),
-      capacities
-    );
-
-    if (isPossible) {
-      setError(null);
-
+    try {
       switch (strategy) {
-        case Strategies.Greedy:
-          waterJugProblem.solveBFS();
-          break;
         case Strategies.BFS:
-          waterJugProblem.solveBFS();
+          solver.solveBFS();
           break;
         case Strategies.BKTR:
-          waterJugProblem.solveBFS();
+          solver.solveBFS();
           break;
         default:
           break;
       }
-      setProblem(waterJugProblem);
+      setProblem(solver);
       setOpen(true);
-    } else {
+    } catch (e) {
       setError(
         "Seems like it's not possible to solve this problem with given inputs"
       );
@@ -176,12 +150,6 @@ function App() {
                 onChange={handleStrategyChange}
                 sx={{ my: 1 }}
               >
-                {/* <Radio
-                  value={Strategies.Greedy}
-                  label={Strategies.Greedy}
-                  color="primary"
-                  variant="soft"
-                /> */}
                 <Radio
                   value={Strategies.BFS}
                   label={Strategies.BFS}

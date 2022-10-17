@@ -1,3 +1,15 @@
+export interface Jug {
+  value: number;
+  readonly capacity: number;
+  readonly name: "small" | "large";
+}
+
+export interface JugState {
+  action: string;
+  simple: string;
+  jugs: [Jug, Jug];
+}
+
 export interface UserInput {
   first: number;
   second: number;
@@ -5,14 +17,8 @@ export interface UserInput {
 }
 
 export enum Strategies {
-  Greedy = "Greedy",
   BFS = "BFS",
   BKTR = "Backtracking",
   HillClimbing = "Hill Climbing",
   AStar = "A*",
-}
-
-export interface Capacity {
-  A: number;
-  B: number;
 }

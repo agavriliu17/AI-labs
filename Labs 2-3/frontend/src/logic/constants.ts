@@ -1,4 +1,5 @@
-export const NO_SOLUTION = "NO SOLUTION";
+export const NO_SOLUTION =
+  "Seems like it's not possible to solve this problem with given inputs";
 
 export enum STATE {
   INITIAL = "Initial State",
