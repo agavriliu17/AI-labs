@@ -1,6 +1,6 @@
 import { NO_SOLUTION, STATE } from "./constants";
 import { dangerousDeepClone } from "./utils";
-import { Jug, JugState } from "./interfaces";
+import { Jug, JugState, HeuristicResult } from "./interfaces";
 
 export class WaterJugSolver {
   queue: JugState[] = [];
@@ -119,13 +119,19 @@ export class WaterJugSolver {
     );
   }
 
-  solveBFS(): JugState[] | typeof NO_SOLUTION {
+  solveHillClimbing(): JugState[] | typeof NO_SOLUTION {
     if (!this.validateInstance()) {
       return NO_SOLUTION;
     }
 
     while (this.queue.length) {
-      const current = this.queue.shift() as JugState;
+      const current = this.queue.pop() as JugState;
+
+      if (this.stateHasGoal(current)) {
+        return this.pathList.find(
+          (path) => path[path.length - 1].simple === current.simple
+        ) as JugState[];
+      }
 
       const nextStates = [
         this.fillJug(current, "small"),
@@ -136,22 +142,28 @@ export class WaterJugSolver {
         this.transfer(current, "large"),
       ];
 
+      let heuristicResults = [];
+
       for (let state of nextStates) {
         const seen = this.tree.has(state.simple);
 
         if (!seen) {
-          this.addEdge(current.simple, state.simple);
-          this.buildPathForState(current, state);
-          this.queue.push(state);
-        }
-
-        if (this.stateHasGoal(state)) {
-          return this.pathList.find(
-            (path) => path[path.length - 1].simple === state.simple
-          ) as JugState[];
+          heuristicResults.push({
+            heuristicValue: this.heuristic(state),
+            state: state,
+          });
         }
       }
+
+      // sort by heuristic value
+      heuristicResults.sort((a, b) => a.heuristicValue - b.heuristicValue);
+      const nextState = heuristicResults[0].state;
+
+      this.addEdge(current.simple, nextState.simple);
+      this.buildPathForState(current, nextState);
+      this.queue.push(nextState);
     }
+
     return NO_SOLUTION;
   }
 
@@ -200,5 +212,148 @@ export class WaterJugSolver {
     const gcdAB = gcd(xGallon, yGallon);
 
     return zGallon % gcdAB === 0 && zGallon <= xGallon + yGallon;
+  }
+
+  solveBFS(): JugState[] | typeof NO_SOLUTION {
+    if (!this.validateInstance()) {
+      return NO_SOLUTION;
+    }
+
+    while (this.queue.length) {
+      const current = this.queue.shift() as JugState;
+
+      const nextStates = [
+        this.fillJug(current, "small"),
+        this.fillJug(current, "large"),
+        this.emptyJug(current, "small"),
+        this.emptyJug(current, "large"),
+        this.transfer(current, "small"),
+        this.transfer(current, "large"),
+      ];
+
+      for (let state of nextStates) {
+        const seen = this.tree.has(state.simple);
+
+        if (!seen) {
+          this.addEdge(current.simple, state.simple);
+          this.buildPathForState(current, state);
+          this.queue.push(state);
+        }
+
+        if (this.stateHasGoal(state)) {
+          return this.pathList.find(
+            (path) => path[path.length - 1].simple === state.simple
+          ) as JugState[];
+        }
+      }
+    }
+    return NO_SOLUTION;
+  }
+
+  solveAStar(): JugState[] | typeof NO_SOLUTION {
+    if (!this.validateInstance()) {
+      return NO_SOLUTION;
+    }
+
+    const heuristicResults = this.generateNextStates(
+      this.queue.shift() as JugState
+    );
+
+    for (let res of heuristicResults) {
+      this.queue.push(res.state);
+    }
+
+    while (this.queue.length) {
+      const current = this.queue.shift() as JugState;
+
+      if (this.stateHasGoal(current)) {
+        return this.pathList.find(
+          (path) => path[path.length - 1].simple === current.simple
+        ) as JugState[];
+      }
+
+      const neighborHeuristicResults = this.generateNextStates(current);
+
+      for (let res of neighborHeuristicResults) {
+        const seen = this.queue.includes(res.state);
+        if (!seen) {
+          continue;
+        }
+      }
+
+      // for (let state of nextStates) {
+      //   const seen = this.tree.has(state.simple);
+
+      //   if (!seen) {
+      //     this.addEdge(current.simple, state.simple);
+      //     this.buildPathForState(current, state);
+      //     this.queue.push(state);
+      //   }
+
+      //   const neighbors = [
+      //     this.fillJug(state, "small"),
+      //     this.fillJug(state, "large"),
+      //     this.emptyJug(state, "small"),
+      //     this.emptyJug(state, "large"),
+      //     this.transfer(state, "small"),
+      //     this.transfer(state, "large"),
+      //   ];
+
+      //   for (let neighbor of neighbors) {
+      //     const seen = this.tree.has(neighbor.simple);
+
+      //     if (!seen) {
+      //       this.addEdge(state.simple, neighbor.simple);
+      //       this.buildPathForState(state, neighbor);
+      //       this.queue.push(neighbor);
+      //     }
+      //   }
+      // }
+    }
+
+    return NO_SOLUTION;
+  }
+
+  // TODO: Add interface for heuristic results
+  generateNextStates(current: JugState) {
+    const nextStates = [
+      this.fillJug(current, "small"),
+      this.fillJug(current, "large"),
+      this.emptyJug(current, "small"),
+      this.emptyJug(current, "large"),
+      this.transfer(current, "small"),
+      this.transfer(current, "large"),
+    ];
+
+    let heuristicResults = [];
+
+    for (let state of nextStates) {
+      const seen = this.tree.has(state.simple);
+
+      if (!seen) {
+        heuristicResults.push({
+          heuristicValue: this.heuristic(state),
+          state: state,
+        });
+      }
+    }
+
+    // sort by heuristic value
+    heuristicResults.sort((a, b) => a.heuristicValue - b.heuristicValue);
+    return heuristicResults;
+  }
+
+  heuristic(state: JugState): number {
+    const [smallCapacity, largeCapacity] = [this.xGallon, this.yGallon].sort(
+      (a, b) => a - b
+    );
+    const [small, large] = [state.jugs[0], state.jugs[1]].sort(
+      (a, b) => a.value - b.value
+    );
+
+    const smallProd = smallCapacity * small.value;
+    const largeProd = largeCapacity * large.value;
+
+    return smallProd + largeProd;
   }
 }

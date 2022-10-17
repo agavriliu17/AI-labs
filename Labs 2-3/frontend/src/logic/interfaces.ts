@@ -10,6 +10,11 @@ export interface JugState {
   jugs: [Jug, Jug];
 }
 
+export interface HeuristicResult {
+  state: Jug;
+  value: number;
+}
+
 export interface UserInput {
   first: number;
   second: number;

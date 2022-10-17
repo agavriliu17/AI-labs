@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import { CssVarsProvider } from "@mui/joy/styles";
@@ -33,6 +33,11 @@ function App() {
     setStrategy(event.target.value as Strategies);
   };
 
+  useEffect(() => {
+    const solver = new WaterJugSolver(9, 4, 6);
+
+    console.log(solver.solveBFS());
+  }, []);
   const handleSubmit = () => {
     const { first, second, final } = inputs;
     const solver = new WaterJugSolver(first, second, final);
