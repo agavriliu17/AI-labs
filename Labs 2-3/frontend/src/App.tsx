@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import { CssVarsProvider } from "@mui/joy/styles";
@@ -12,6 +12,7 @@ import Button from "@mui/joy/Button";
 import { UserInput, Strategies, Capacity } from "./logic/interfaces";
 import { WaterJugProblem } from "./logic/water-jug";
 import ResultsModal from "./Modal";
+import { WaterJugSolver } from "./new/water-jug-solver";
 
 function App() {
   const [inputs, setInputs] = useState<UserInput>({
@@ -19,7 +20,7 @@ function App() {
     second: 0,
     final: 0,
   });
-  const [strategy, setStrategy] = useState<Strategies>(Strategies.Greedy);
+  const [strategy, setStrategy] = useState<Strategies>(Strategies.BFS);
   const [problem, setProblem] = useState<WaterJugProblem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -32,6 +33,13 @@ function App() {
   const handleStrategyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStrategy(event.target.value as Strategies);
   };
+
+  useEffect(() => {
+    const solver = new WaterJugSolver(9, 4, 6);
+    console.log(solver.solveBFS());
+    solver.solveBKT();
+    console.log(solver.pathList);
+  }, []);
 
   const handleSubmit = () => {
     const { first, second, final } = inputs;
@@ -55,13 +63,13 @@ function App() {
 
       switch (strategy) {
         case Strategies.Greedy:
-          waterJugProblem.solveGreedy();
+          waterJugProblem.solveBFS();
           break;
         case Strategies.BFS:
           waterJugProblem.solveBFS();
           break;
         case Strategies.BKTR:
-          waterJugProblem.solveBacktracking();
+          waterJugProblem.solveBFS();
           break;
         default:
           break;
@@ -168,12 +176,12 @@ function App() {
                 onChange={handleStrategyChange}
                 sx={{ my: 1 }}
               >
-                <Radio
+                {/* <Radio
                   value={Strategies.Greedy}
                   label={Strategies.Greedy}
                   color="primary"
                   variant="soft"
-                />
+                /> */}
                 <Radio
                   value={Strategies.BFS}
                   label={Strategies.BFS}
@@ -184,7 +192,6 @@ function App() {
                 <Radio
                   value={Strategies.BKTR}
                   label={Strategies.BKTR}
-                  disabled
                   sx={{ marginTop: "15px" }}
                   color="primary"
                   variant="soft"

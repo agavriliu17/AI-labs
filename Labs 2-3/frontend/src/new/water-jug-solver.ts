@@ -119,7 +119,7 @@ export class WaterJugSolver {
     );
   }
 
-  solve(): JugState[] | typeof NO_SOLUTION {
+  solveBFS(): JugState[] | typeof NO_SOLUTION {
     // ZGallon can't be more water than the combined jugs.
     if (this.xGallon + this.yGallon < this.zGallon) {
       return NO_SOLUTION;
@@ -150,6 +150,7 @@ export class WaterJugSolver {
           this.buildPathForState(current, state);
           this.queue.push(state);
         }
+
         if (this.stateHasGoal(state)) {
           return this.pathList.find(
             (path) => path[path.length - 1].simple === state.simple
@@ -159,7 +160,39 @@ export class WaterJugSolver {
     }
     return NO_SOLUTION;
   }
+
+  solveBKT(state: JugState = this.queue[0]) {
+    if (this.stateHasGoal(state)) {
+      return this.pathList.find(
+        (path) => path[path.length - 1].simple === state.simple
+      ) as JugState[];
+    }
+
+    const current = this.queue.pop() as JugState;
+
+    const nextStates = [
+      this.fillJug(current, "small"),
+      this.fillJug(current, "large"),
+      this.emptyJug(current, "small"),
+      this.emptyJug(current, "large"),
+      this.transfer(current, "small"),
+      this.transfer(current, "large"),
+    ];
+
+    for (let state of nextStates) {
+      const seen = this.tree.has(state.simple);
+
+      if (!seen) {
+        this.addEdge(current.simple, state.simple);
+        this.buildPathForState(current, state);
+        this.queue.push(state);
+
+        this.solveBKT(state);
+      }
+    }
+  }
 }
 
-const solver = new WaterJugSolver(9, 4, 6);
-console.log(solver.solve());
+// const solver = new WaterJugSolver(9, 4, 6);
+// console.log(solver.solveBFS());
+// console.log(solver.solveBKTR());
