@@ -279,6 +279,9 @@ export class WaterJugSolver {
       explored.push(newState);
       let neighbours = this.generateNextStates(newState.state);
       for (let element of neighbours) {
+        if (explored.includes(element)) {
+          continue;
+        }
         let distance = this.pathList.length;
         element.value += distance;
         const elementIndex = statesQueue.findIndex(
@@ -300,7 +303,6 @@ export class WaterJugSolver {
     return NO_SOLUTION;
   }
 
-  // TODO: Add interface for heuristic results
   generateNextStates(current: JugState) {
     const nextStates = [
       this.fillJug(current, "small"),

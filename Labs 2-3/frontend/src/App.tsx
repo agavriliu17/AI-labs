@@ -33,22 +33,28 @@ function App() {
     setStrategy(event.target.value as Strategies);
   };
 
-  useEffect(() => {
-    const solver = new WaterJugSolver(9, 4, 6);
-
-    console.log(solver.solveAStar());
-  }, []);
   const handleSubmit = () => {
     const { first, second, final } = inputs;
-    const solver = new WaterJugSolver(first, second, final);
+    const solver = new WaterJugSolver(
+      parseInt(first as unknown as string),
+      parseInt(second as unknown as string),
+      parseInt(final as unknown as string)
+    );
 
     try {
       switch (strategy) {
         case Strategies.BFS:
-          solver.solveBFS();
+          console.log(solver.solveBFS());
           break;
         case Strategies.BKTR:
           solver.solveBFS();
+          console.log(solver.tree);
+          break;
+        case Strategies.HillClimbing:
+          console.log(solver.solveHillClimbing());
+          break;
+        case Strategies.AStar:
+          console.log(solver.solveAStar());
           break;
         default:
           break;
@@ -172,7 +178,6 @@ function App() {
                 <Radio
                   value={Strategies.HillClimbing}
                   label={Strategies.HillClimbing}
-                  disabled
                   sx={{ marginTop: "15px" }}
                   color="primary"
                   variant="soft"
