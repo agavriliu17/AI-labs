@@ -178,5 +178,5 @@ class Board:
 if __name__ == '__main__':
     #b1 = Board(4, [[1, 3], [1, 2], [2, 2]])
     b1 = Board('block-10-58-1.param')
-    # b1.show()
+    #b1.show()
     b1.solve_NQueen_FC(0)
