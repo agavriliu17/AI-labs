@@ -19,6 +19,18 @@ class Board:
         for block in blocks:
             self.board[block[0]][block[1]] = -1
         self.np_board = np.matrix(self.board)
+
+    def __init__(self, file):
+        board_info = self.read_instance(file)
+        self.size = board_info[0]
+        blocks = board_info[1]
+        for i in range(self.size):
+            row = [0] * self.size
+            self.board.append(row)
+        for block in blocks:
+            self.board[block[0]][block[1]] = -1
+        self.np_board = np.matrix(self.board)
+
         
     
     def show(self):
@@ -56,32 +68,20 @@ class Board:
         f = open(file, 'r')
         line1 = f.readline()
         line_split = line1.split()
-        size = line_split[len(line_split)-1]
+        size = int(line_split[len(line_split)-1])
         line2 = f.readline()
         line_split = line2.split('=  ')
-        instance = line_split[1]
-        instance = instance.replace('[','')
-        instance = instance.replace(']]\n','')
-        instance = instance.replace(']','.')
-        instance = instance.replace('., ',';')
-        instance = instance.replace(', ',',')
-        instance = instance.split(';')
+        instance = line_split[1].replace('[','').replace(']]\n','').replace(']','.').replace('., ',';').replace(', ',',').split(';')
 
         instance_list = []
-        # for element in instance:
-            #for every element convert a,b -> [a, b]
-            # value = self.convert_value(str(element))
-            # instance_list.append(value)
+        for element in instance:
+            values = str(element).split(',')
+            instance_list.append([int(values[0])-1, int(values[1])-1])
+            
 
         return (size, instance_list)
         
-b1 = Board(4, [[1, 3], [1, 2], [2, 2]])
+# b1 = Board(4, [[1, 3], [1, 2], [2, 2]])
+b1 = Board('block-10-58-1.param')
 b1.show()
-print(b1.place_queen([1,1]))
-# print(b1.place_queen([1,3]))
-# print(b1.place_queen([1,1]))
-b1.show()
-print(b1.show_domains())
-# print(b1.read_instance("block-10-58-1.param"))
-# print("------")
-# print(np.flipud(b1.np_board).diagonal())
+
