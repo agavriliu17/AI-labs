@@ -62,8 +62,35 @@ class Game:
             index += 1
         return max_index
 
+    def get_nash_equilibrium(self, player):
+        if player not in (1,2):
+            raise ValueError('Invalid player number!')
+        best_strategies_matrix = []
+        if player == 1:
+            for column in range(0, len(self.moves[0])):
+                best_move = 0
+                best_score = 0
+                for line in range(0, len(self.moves)):
+                    score = self.moves[line][column][0] - self.moves[line][column][1]
+                    if score > best_score:
+                        best_score = score
+                        best_move = line
+                best_strategies_matrix.append((best_move, column))
+        else:
+            for line in range(0, len(self.moves)):
+                best_move = 0
+                best_score = 0
+                for column in range(0, len(self.moves[0])):
+                    score = self.moves[line][column][1] - self.moves[line][column][0]
+                    if score > best_score:
+                        best_score = score
+                        best_move = column
+                best_strategies_matrix.append((line, best_move))
+        return best_strategies_matrix
+        
 
 if __name__ == "__main__":
     game = Game("problem.txt")
     print(game.get_dominant_strategy(1))
+    print(game.get_nash_equilibrium(2))
 
