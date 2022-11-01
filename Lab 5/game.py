@@ -15,11 +15,11 @@ class Game:
         f = open(path, 'r')
         line1 = f.readline().split()
         self.player1['name'] = line1[0]
-        self.player1['moves'] = [line1[1], line1[2]]
+        self.player1['moves'] = line1[1:]
 
         line1 = f.readline().split()
         self.player2['name'] = line1[0]
-        self.player2['moves'] = [line1[1], line1[2]]
+        self.player2['moves'] = line1[1:]
 
         line = f.readline()
 
