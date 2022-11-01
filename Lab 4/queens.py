@@ -14,6 +14,7 @@ class Board:
             for i in range(self.size):
                 row = [0] * self.size
                 self.board.append(row)
+            
             for block in blocks:
                 self.board[block[0]][block[1]] = -1
             self.np_board = np.matrix(self.board)

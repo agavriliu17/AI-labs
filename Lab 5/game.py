@@ -60,6 +60,13 @@ class Game:
                 max_point = p
                 max_index = index
             index += 1
+
+        if(player == 0):
+            strategy = self.player1['moves'][max_index]
+        else:
+            strategy = self.player2['moves'][max_index]
+
+        print('Player ' + str(player + 1) + ' has a dominant strategy: ' + strategy)
         return max_index
 
     def get_nash_equilibrium(self, player):
@@ -91,6 +98,7 @@ class Game:
 
 if __name__ == "__main__":
     game = Game("problem.txt")
-    print(game.get_dominant_strategy(1))
+    print('---------------------------------------')
+    game.get_dominant_strategy(1)
     print(game.get_nash_equilibrium(2))
 
